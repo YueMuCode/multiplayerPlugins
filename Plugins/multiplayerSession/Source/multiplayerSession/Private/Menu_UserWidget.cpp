@@ -8,8 +8,9 @@
 #include "OnlineSubsystem.h"
 #include "Components/Button.h"
 
-void UMenu_UserWidget::MenuSetup(int32 NumberOfPublicConnections,FString TypeOfMatch)
+void UMenu_UserWidget::MenuSetup(int32 NumberOfPublicConnections,FString TypeOfMatch,FString LobbyPath)
 {
+	PathToLobby=FString::Printf(TEXT("%s?listen"),*LobbyPath);
 	NumPublicConnections=NumberOfPublicConnections;
 	MatchType=TypeOfMatch;
 	AddToViewport();//将这个UI添加到视口
@@ -105,7 +106,7 @@ void UMenu_UserWidget::OnCreateSession(bool bWasSuccessful)
 		UWorld* World=GetWorld();
 		if(World)
 		{
-			World->ServerTravel("/Game/ThirdPerson/Maps/Lobby?listen");//服务器端执行旅行操作，切换当前服务器上运行的地图或连接到其他服务器
+			World->ServerTravel(PathToLobby);//服务器端执行旅行操作，切换当前服务器上运行的地图或连接到其他服务器
 		}
 		if(GEngine)
 		{
