@@ -35,8 +35,8 @@ protected:
 	void OnStartSessionComplete(FName SessionName,bool bWasSuccessful);
 
 private:
-	IOnlineSessionPtr SessionInterface;//IOnlineSessionPtr智能指针
-	
+	IOnlineSessionPtr SessionInterface;//IOnlineSessionPtr智能指针管理会话
+	TSharedPtr<FOnlineSessionSettings> LastSessionSettings;//用智能指针指向一个存储会话设置的结构体
 	//委托列表，将要绑定对应的回调函数给这些委托
 
 	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;

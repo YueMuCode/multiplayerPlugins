@@ -6,8 +6,10 @@
 #include "MultiplayerSessionsSubsystem.h"
 #include "Components/Button.h"
 
-void UMenu_UserWidget::MenuSetup()
+void UMenu_UserWidget::MenuSetup(int32 NumberOfPublicConnections,FString TypeOfMatch)
 {
+	NumPublicConnections=NumberOfPublicConnections;
+	MatchType=TypeOfMatch;
 	AddToViewport();//将这个UI添加到视口
 	SetVisibility(ESlateVisibility::Visible);//设置可见
 	bIsFocusable=true;//让这个 UI 元素能够接收焦点，从而能够与用户的输入进行交互，比如接收键盘输入或鼠标点击。
@@ -37,6 +39,22 @@ void UMenu_UserWidget::MenuSetup()
 	}
 }
 
+void UMenu_UserWidget::MenuTearDown()
+{
+	RemoveFromParent();
+	UWorld* World=GetWorld();
+	if(ensure(World))
+	{
+		APlayerController* PlayerController=World->GetFirstPlayerController();
+		if(PlayerController)
+		{
+			FInputModeGameOnly InputModeData;
+			PlayerController->SetInputMode(InputModeData);
+			PlayerController->SetShowMouseCursor(false);
+		}
+	}
+}
+
 bool UMenu_UserWidget::Initialize()
 {
 	if(!Super::Initialize())
@@ -54,6 +72,13 @@ bool UMenu_UserWidget::Initialize()
 	return true;
 }
 
+//切换level之后恢复鼠标模式
+void UMenu_UserWidget::NativeDestruct()
+{
+	MenuTearDown();
+	Super::NativeDestruct();
+}
+
 void UMenu_UserWidget::HostButtonClicked()
 {
 	//屏幕调试信息
@@ -67,9 +92,18 @@ void UMenu_UserWidget::HostButtonClicked()
 			);
 	}
 
+	
+	//正式调用前面创建的函数创建联机会话
 	if(MultiplayerSessionsSubsystem)
 	{
-		MultiplayerSessionsSubsystem->CreateSession(4,FString("FreeForAll"));//创建一个名为“FreeForAll”的容纳四个人的会话
+		MultiplayerSessionsSubsystem->CreateSession(NumPublicConnections,MatchType);//创建一个名为“FreeForAll”的容纳四个人的会话
+
+		//创建好会话之后，立马进入大厅
+		UWorld* World=GetWorld();
+		if(World)
+		{
+			World->ServerTravel("/Game/ThirdPerson/Maps/Lobby?listen");//服务器端执行旅行操作，切换当前服务器上运行的地图或连接到其他服务器
+		}
 	}
 }
 

@@ -15,10 +15,14 @@ class MULTIPLAYERSESSION_API UMenu_UserWidget : public UUserWidget
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintCallable)
-	void MenuSetup();
+	void MenuSetup(int32 NumberOfPublicConnections=4,FString TypeOfMatch=FString(TEXT("FreeForAll")));
+
+	UFUNCTION(BlueprintCallable)
+	void MenuTearDown();
 
 protected:
 	virtual  bool Initialize() override;//为什么要使用Initialize
+	virtual  void NativeDestruct() override;//当切换场景时，widget组件将会调用这个虚函数
 	
 private:
 	UPROPERTY(meta=(BindWidget))//并指定该属性应该与一个 UI 控件进行绑定。这样，在使用该属性时，
@@ -39,4 +43,8 @@ private:
 
 	//菜单类中访问子系统的指针。
 	class UMultiplayerSessionsSubsystem* MultiplayerSessionsSubsystem;
+
+
+	int32 NumPublicConnections;
+	FString MatchType{TEXT("FreeForAll")};
 };
