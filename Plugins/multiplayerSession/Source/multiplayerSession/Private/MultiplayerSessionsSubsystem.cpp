@@ -5,6 +5,7 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSessionSettings.h"
 
+//将函数OnCreateSessionComplete订阅到CreateSessionCompleteDelegate委托中，这个委托是子系统自带的函数，当创建会话成功时会自动触发
 UMultiplayerSessionsSubsystem::UMultiplayerSessionsSubsystem():
 CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this,&ThisClass::OnCreateSessionComplete)),
 FindSessionCompleteDelegate(FOnFindSessionsCompleteDelegate::CreateUObject(this,&ThisClass::OnFindSessionsComplete)),
@@ -24,7 +25,7 @@ StartSessionCompleteDelegate(FOnStartSessionCompleteDelegate::CreateUObject(this
 
 void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FString MatchType)
 {
-	//如果会话不存在
+	//如果会话接口不存在
 	if(!SessionInterface.IsValid())
 	{
 		return ;
@@ -57,6 +58,8 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
 	{
 		//如果创建失败
 		SessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegateHandle);//移除委托句柄下的委托
+		//广播委托
+		MultiplayerOnCreateSessionComplete.Broadcast(false);
 	}
 	
 } 
@@ -77,8 +80,14 @@ void UMultiplayerSessionsSubsystem::StartSession()
 {
 }
 
+//如果子系统成功创建会话，那么他会执行自带的回调。不明白第一个参数的意义
 void UMultiplayerSessionsSubsystem::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
 {
+	if(SessionInterface)
+	{
+		SessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegateHandle);
+	}
+	MultiplayerOnCreateSessionComplete.Broadcast(bWasSuccessful);
 }
 
 void UMultiplayerSessionsSubsystem::OnFindSessionsComplete(bool bWasSuccessful)

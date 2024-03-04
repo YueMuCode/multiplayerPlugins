@@ -8,6 +8,17 @@
 
 #include "MultiplayerSessionsSubsystem.generated.h"
 
+//自定义委托
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiplayerOnCreateSessionComplete,bool,bWasSuccessful);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FMultiplayerOnFindSessionComplete,const TArray<FOnlineSessionSearchResult>& SessionResults,bool bWasSuccessful)
+DECLARE_MULTICAST_DELEGATE_OneParam(FMultiplayerOnJoinSessionComplete,EOnJoinSessionCompleteResult::Type Result);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiplayerOnDestroySessionComplete,bool, bWasSuccessful);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiplayerOnStartSessionComplete,bool, bWasSuccessful);
+
+
+
+
+
 /**
  * 
  */
@@ -25,6 +36,13 @@ public:
 	void JoinSession(const FOnlineSessionSearchResult& SessionResult);//加入会话，返回的搜索到的会话结果
 	void DestroySession();//销毁会话
 	void StartSession();//启动会话？
+
+	//自定义委托的声明
+	FMultiplayerOnCreateSessionComplete MultiplayerOnCreateSessionComplete;
+	FMultiplayerOnFindSessionComplete MultiplayerOnFindSessionComplete;
+	FMultiplayerOnJoinSessionComplete MultiplayerOnJoinSessionComplete;
+	FMultiplayerOnDestroySessionComplete MultiplayerOnDestroySessionComplete;
+	FMultiplayerOnStartSessionComplete MultiplayerOnStartSessionComplete;
 	
 protected:
 	//内部回调函数
@@ -38,6 +56,7 @@ private:
 	IOnlineSessionPtr SessionInterface;//IOnlineSessionPtr智能指针管理会话
 	TSharedPtr<FOnlineSessionSettings> LastSessionSettings;//用智能指针指向一个存储会话设置的结构体
 	//委托列表，将要绑定对应的回调函数给这些委托
+	TSharedPtr<FOnlineSessionSearch> LastSessionSearch;
 
 	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
 	FOnFindSessionsCompleteDelegate FindSessionCompleteDelegate;
@@ -51,4 +70,8 @@ private:
 	FDelegateHandle JoinSessionCompleteDelegateHandle;
 	FDelegateHandle DestroySessionCompleteDelegateHandle;
 	FDelegateHandle StartSessionCompleteDelegateHandle;
+
+	bool bCreateSessionOnDestroy{false};
+	int LastNumPublicConnections;
+	FString LastMatchType;
 };

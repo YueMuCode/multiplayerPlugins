@@ -37,6 +37,16 @@ void UMenu_UserWidget::MenuSetup(int32 NumberOfPublicConnections,FString TypeOfM
 	{
 		MultiplayerSessionsSubsystem= GameInstance->GetSubsystem<UMultiplayerSessionsSubsystem>();
 	}
+
+	if(MultiplayerSessionsSubsystem	)//委托订阅函数
+		{
+		MultiplayerSessionsSubsystem->MultiplayerOnCreateSessionComplete.AddDynamic(this,&ThisClass::OnCreateSession);
+		//MultiplayerSessionsSubsystem->MultiplayerOnFindSessionComplete.AddUObject(this,&ThisClass::OnFindSession);
+		//MultiplayerSessionsSubsystem->MultiplayerOnJoinSessionComplete.AddUObject(this,&ThisClass::OnJoinSession);
+		//MultiplayerSessionsSubsystem->MultiplayerOnDestroySessionComplete.AddDynamic(this,&ThisClass::OnDestroySession);
+		//MultiplayerSessionsSubsystem->MultiplayerOnStartSessionComplete.AddDynamic(this,&ThisClass::OnStartSession);
+		}
+	
 }
 
 void UMenu_UserWidget::MenuTearDown()
@@ -79,6 +89,37 @@ void UMenu_UserWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
+void UMenu_UserWidget::OnCreateSession(bool bWasSuccessful)
+{
+	if(bWasSuccessful)
+	{
+		// UWorld* World=GetWorld();
+		// if(ensure(World))
+		// {
+		// 	World->ServerTravel(PathToLobby);
+		// }
+		
+		//创建好会话之后，当结果回调到menu时立马进入大厅
+		UWorld* World=GetWorld();
+		if(World)
+		{
+			World->ServerTravel("/Game/ThirdPerson/Maps/Lobby?listen");//服务器端执行旅行操作，切换当前服务器上运行的地图或连接到其他服务器
+		}
+		if(GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1,15.0f,FColor::Cyan,FString(TEXT("会话创建成功")));
+		}
+	}
+	else
+	{
+		if(GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1,15.0f,FColor::Red,FString(TEXT("创建会话失败，无法前往大厅")));
+		}
+		//HostButton->SetIsEnabled(true);
+	}
+}
+
 void UMenu_UserWidget::HostButtonClicked()
 {
 	//屏幕调试信息
@@ -91,19 +132,11 @@ void UMenu_UserWidget::HostButtonClicked()
 			FString((TEXT("创建按钮点击了，正在试图创建会话")))
 			);
 	}
-
 	
 	//正式调用前面创建的函数创建联机会话
 	if(MultiplayerSessionsSubsystem)
 	{
 		MultiplayerSessionsSubsystem->CreateSession(NumPublicConnections,MatchType);//创建一个名为“FreeForAll”的容纳四个人的会话
-
-		//创建好会话之后，立马进入大厅
-		UWorld* World=GetWorld();
-		if(World)
-		{
-			World->ServerTravel("/Game/ThirdPerson/Maps/Lobby?listen");//服务器端执行旅行操作，切换当前服务器上运行的地图或连接到其他服务器
-		}
 	}
 }
 
