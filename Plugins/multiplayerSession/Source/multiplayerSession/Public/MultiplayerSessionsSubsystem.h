@@ -45,7 +45,7 @@ public:
 	FMultiplayerOnStartSessionComplete MultiplayerOnStartSessionComplete;
 	
 protected:
-	//内部回调函数
+	//子系统委托订阅的回调函数
 	void OnCreateSessionComplete(FName SessionName,bool bWasSuccessful);
 	void OnFindSessionsComplete(bool bWasSuccessful);
 	void OnJoinSessionComplete(FName SessionName,EOnJoinSessionCompleteResult::Type Result);
@@ -58,6 +58,7 @@ private:
 	//委托列表，将要绑定对应的回调函数给这些委托
 	TSharedPtr<FOnlineSessionSearch> LastSessionSearch;
 
+	//子系统委托
 	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
 	FOnFindSessionsCompleteDelegate FindSessionCompleteDelegate;
 	FOnJoinSessionCompleteDelegate JoinSessionCompleteDelegate;

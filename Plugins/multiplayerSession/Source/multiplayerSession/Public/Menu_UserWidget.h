@@ -28,14 +28,12 @@ protected:
 	//回调函数，委托给子系统
 	UFUNCTION()//有些委托订阅的回调函数必须是U函数
 	void OnCreateSession(bool bWasSuccessful);
-	
-	//void OnFindSession(const TArray<FOnlineSessionSearchResult>& SessionResults,bool bWasSuccessful);
-
-	//void OnJoinSession(EOnJoinSessionCompleteResult::Type Result);
-	//UFUNCTION()
-	//void OnDestroySession(bool bWasSuccessful);
-	//UFUNCTION()
-	//void OnStartSession(bool bWasSuccessful);
+	void OnFindSession(const TArray<FOnlineSessionSearchResult>& SessionResults,bool bWasSuccessful);
+	void OnJoinSession(EOnJoinSessionCompleteResult::Type Result);
+	UFUNCTION()
+	void OnDestroySession(bool bWasSuccessful);
+	UFUNCTION()
+	void OnStartSession(bool bWasSuccessful);
 	
 private:
 	UPROPERTY(meta=(BindWidget))//并指定该属性应该与一个 UI 控件进行绑定。这样，在使用该属性时，

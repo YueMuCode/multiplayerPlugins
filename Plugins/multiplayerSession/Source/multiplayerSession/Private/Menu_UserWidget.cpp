@@ -41,10 +41,10 @@ void UMenu_UserWidget::MenuSetup(int32 NumberOfPublicConnections,FString TypeOfM
 	if(MultiplayerSessionsSubsystem	)//委托订阅函数
 		{
 		MultiplayerSessionsSubsystem->MultiplayerOnCreateSessionComplete.AddDynamic(this,&ThisClass::OnCreateSession);
-		//MultiplayerSessionsSubsystem->MultiplayerOnFindSessionComplete.AddUObject(this,&ThisClass::OnFindSession);
-		//MultiplayerSessionsSubsystem->MultiplayerOnJoinSessionComplete.AddUObject(this,&ThisClass::OnJoinSession);
-		//MultiplayerSessionsSubsystem->MultiplayerOnDestroySessionComplete.AddDynamic(this,&ThisClass::OnDestroySession);
-		//MultiplayerSessionsSubsystem->MultiplayerOnStartSessionComplete.AddDynamic(this,&ThisClass::OnStartSession);
+		MultiplayerSessionsSubsystem->MultiplayerOnFindSessionComplete.AddUObject(this,&ThisClass::OnFindSession);
+		MultiplayerSessionsSubsystem->MultiplayerOnJoinSessionComplete.AddUObject(this,&ThisClass::OnJoinSession);
+		MultiplayerSessionsSubsystem->MultiplayerOnDestroySessionComplete.AddDynamic(this,&ThisClass::OnDestroySession);
+		MultiplayerSessionsSubsystem->MultiplayerOnStartSessionComplete.AddDynamic(this,&ThisClass::OnStartSession);
 		}
 	
 }
@@ -118,6 +118,22 @@ void UMenu_UserWidget::OnCreateSession(bool bWasSuccessful)
 		}
 		//HostButton->SetIsEnabled(true);
 	}
+}
+
+void UMenu_UserWidget::OnFindSession(const TArray<FOnlineSessionSearchResult>& SessionResults, bool bWasSuccessful)
+{
+}
+
+void UMenu_UserWidget::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
+{
+}
+
+void UMenu_UserWidget::OnDestroySession(bool bWasSuccessful)
+{
+}
+
+void UMenu_UserWidget::OnStartSession(bool bWasSuccessful)
+{
 }
 
 void UMenu_UserWidget::HostButtonClicked()
