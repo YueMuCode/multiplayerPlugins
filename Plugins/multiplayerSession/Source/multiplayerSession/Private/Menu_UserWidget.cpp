@@ -119,7 +119,7 @@ void UMenu_UserWidget::OnCreateSession(bool bWasSuccessful)
 		{
 			GEngine->AddOnScreenDebugMessage(-1,15.0f,FColor::Red,FString(TEXT("创建会话失败，无法前往大厅")));
 		}
-		//HostButton->SetIsEnabled(true);
+		HostButton->SetIsEnabled(true);
 	}
 }
 
@@ -189,6 +189,7 @@ void UMenu_UserWidget::OnStartSession(bool bWasSuccessful)
 
 void UMenu_UserWidget::HostButtonClicked()
 {
+	HostButton->SetIsEnabled(false);
 	//屏幕调试信息
 	if(GEngine)
 	{
@@ -209,6 +210,7 @@ void UMenu_UserWidget::HostButtonClicked()
 
 void UMenu_UserWidget::JoinButtonClicked()
 {
+	JoinButton->SetIsEnabled(false);
 	if(GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(
