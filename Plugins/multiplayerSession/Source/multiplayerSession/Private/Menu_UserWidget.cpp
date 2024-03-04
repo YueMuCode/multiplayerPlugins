@@ -4,6 +4,8 @@
 #include "Menu_UserWidget.h"
 
 #include "MultiplayerSessionsSubsystem.h"
+#include "OnlineSessionSettings.h"
+#include "OnlineSubsystem.h"
 #include "Components/Button.h"
 
 void UMenu_UserWidget::MenuSetup(int32 NumberOfPublicConnections,FString TypeOfMatch)
@@ -122,10 +124,58 @@ void UMenu_UserWidget::OnCreateSession(bool bWasSuccessful)
 
 void UMenu_UserWidget::OnFindSession(const TArray<FOnlineSessionSearchResult>& SessionResults, bool bWasSuccessful)
 {
+	//可以在这里设置显示搜索列表
+	if(MultiplayerSessionsSubsystem==nullptr)
+	{
+		return;
+	}
+	//遍历查找到的会话，符合条件的就加入
+	for(auto Result:SessionResults)
+	{
+		FString SettingValue;
+		Result.Session.SessionSettings.Get(FName("MatchType"),SettingValue);
+		if(SettingValue==MatchType)
+		{
+			MultiplayerSessionsSubsystem->JoinSession(Result);
+			return;
+		}
+	}
+	if(!bWasSuccessful||SessionResults.Num()==0)
+	{
+		JoinButton->SetIsEnabled(true);
+	}
 }
 
 void UMenu_UserWidget::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
 {
+	IOnlineSubsystem* Subsystem=IOnlineSubsystem::Get();
+	if(Subsystem)
+	{
+		IOnlineSessionPtr SessionInterface=Subsystem->GetSessionInterface();
+		if(SessionInterface.IsValid())
+		{
+			FString Address;
+			//执行到这里，说明客户端已经连接到服务器，也就是说，此时的NAME_GameSession的值就是目标会话的名字，也就能获取他对应的地址了
+			SessionInterface->GetResolvedConnectString(NAME_GameSession,Address);
+			APlayerController* PlayerController=GetGameInstance()->GetFirstLocalPlayerController();
+			if(PlayerController)
+			{
+				PlayerController->ClientTravel(Address,TRAVEL_Absolute);
+			}
+		}
+	}
+	else
+	{
+		if(GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1,4.0f,FColor::Orange,FString(TEXT("Subsystem为空，加入失败")));
+		}
+	}
+
+	if(Result!=EOnJoinSessionCompleteResult::Success)
+	{
+		JoinButton->SetIsEnabled(true);
+	}
 }
 
 void UMenu_UserWidget::OnDestroySession(bool bWasSuccessful)
@@ -166,6 +216,10 @@ void UMenu_UserWidget::JoinButtonClicked()
 			FColor::Yellow,
 			FString((TEXT("加入按钮点击了，正在试图加入会话")))
 			);
+	}
+	if(MultiplayerSessionsSubsystem)
+	{
+		MultiplayerSessionsSubsystem->FindSessions(10000);
 	}
 }
                                                                                                 
