@@ -44,6 +44,17 @@ private:
 	UPROPERTY(meta=(BindWidget))
 	 UButton* JoinButton;
 
+
+	//点击按钮后的UI信息
+	UPROPERTY(meta=(BindWidget))
+	class UBorder* HostmessageBorder;
+	UPROPERTY(meta=(BindWidget))
+	UBorder* FindMessageBorder;
+	UPROPERTY(meta=(BindWidget))
+	UBorder* JoinMessageBorder;
+
+	
+
 	//当按钮点击时需要完成的逻辑
 
 	UFUNCTION()

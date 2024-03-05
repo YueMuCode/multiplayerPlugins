@@ -6,7 +6,10 @@
 #include "MultiplayerSessionsSubsystem.h"
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
+#include "Components/Border.h"
 #include "Components/Button.h"
+#include "Engine/Canvas.h"
+
 
 void UMenu_UserWidget::MenuSetup(int32 NumberOfPublicConnections,FString TypeOfMatch,FString LobbyPath)
 {
@@ -96,16 +99,12 @@ void UMenu_UserWidget::OnCreateSession(bool bWasSuccessful)
 {
 	if(bWasSuccessful)
 	{
-		// UWorld* World=GetWorld();
-		// if(ensure(World))
-		// {
-		// 	World->ServerTravel(PathToLobby);
-		// }
 		
 		//创建好会话之后，当结果回调到menu时立马进入大厅
 		UWorld* World=GetWorld();
 		if(World)
 		{
+			
 			World->ServerTravel(PathToLobby);//服务器端执行旅行操作，切换当前服务器上运行的地图或连接到其他服务器
 		}
 		if(GEngine)
@@ -189,6 +188,7 @@ void UMenu_UserWidget::OnStartSession(bool bWasSuccessful)
 
 void UMenu_UserWidget::HostButtonClicked()
 {
+	HostmessageBorder->SetVisibility(ESlateVisibility::Visible);
 	HostButton->SetIsEnabled(false);
 	//屏幕调试信息
 	if(GEngine)
@@ -210,6 +210,7 @@ void UMenu_UserWidget::HostButtonClicked()
 
 void UMenu_UserWidget::JoinButtonClicked()
 {
+	JoinMessageBorder->SetVisibility(ESlateVisibility::Visible);
 	JoinButton->SetIsEnabled(false);
 	if(GEngine)
 	{
